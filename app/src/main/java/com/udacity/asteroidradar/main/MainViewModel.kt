@@ -1,15 +1,17 @@
 package com.udacity.asteroidradar.main
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.Constants
-import com.udacity.asteroidradar.Network.AsteroidApi
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.network.AsteroidApi
+import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -25,13 +27,39 @@ class MainViewModel : ViewModel() {
         getResponse()
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    fun getResponse(){
+    private fun getResponse(){
+    /*
+    I was getting error while parsing json response saying "expected begin_array but was begin_object"
 
-        //enqueue retrofit service
+    So, I used  provided parsing method but it also has bug
+    While searching for answer in udacity help center, I came across
+    https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
+
+     */
+
+/*
+using coroutines
+ */
+        viewModelScope.launch {
+
+                try {
+
+                    val asteroidResult: String = AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
+                    _status.value = parseAsteroidsJsonResult(JSONObject(asteroidResult)).size.toString()
+
+                }catch (e : Exception)
+                {
+                    _status.value = "Failure" +e.message
+                }
+
+
+        }
+ /*       //enqueue retrofit service
             AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey).enqueue(object :Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                _status.value = response.body()
+                        val jobject = response.body()?.let { JSONObject(it) }
+                        _status.value = jobject?.let { parseAsteroidsJsonResult(it).size.toString() }
+
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
@@ -39,17 +67,18 @@ class MainViewModel : ViewModel() {
             }
 
         })
-
+*/
     }
 
-  private  fun getTodayDate(): String {
+    @SuppressLint("NewApi")
+    private  fun getTodayDate(): String {
 
         //getting instance of date
         val date = Calendar.getInstance().time
        //IDE suggested that Y pattern needs to first check for version
         val simpleDateFormatter = 
             //but small y is accepted by IDE
-            SimpleDateFormat("yyyy-MM-dd")
+            SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
 
 
         //returning Date as String
