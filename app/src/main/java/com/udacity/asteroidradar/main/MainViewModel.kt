@@ -7,8 +7,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.api.parsePicOfTheDay
 import com.udacity.asteroidradar.network.AsteroidApi
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -22,6 +24,12 @@ class MainViewModel : ViewModel() {
     private var _status = MutableLiveData<String>()
     val status : LiveData<String>
     get() = _status
+
+
+    //Encapsulated pic of the day variable
+    private var _picOfTheDay = MutableLiveData<String>()
+    val pictureOfDay : LiveData<String>
+    get() = _picOfTheDay
 
     init {
         getResponse()
@@ -44,8 +52,13 @@ using coroutines
 
                 try {
 
-                    val asteroidResult: String = AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
+                    val asteroidResult: String =
+                        AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
                     _status.value = parseAsteroidsJsonResult(JSONObject(asteroidResult)).size.toString()
+
+                    //as status is ok, we will retrieve pic of the day
+              val string =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
+                _picOfTheDay.value = parsePicOfTheDay(JSONObject(string)).toString()
 
                 }catch (e : Exception)
                 {

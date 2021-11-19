@@ -1,15 +1,40 @@
 package com.udacity.asteroidradar.api
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.core.net.toUri
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import org.json.JSONObject
 import java.lang.IllegalArgumentException
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
 
+
+/*
+parse method for pic of the day
+ */
+fun parsePicOfTheDay(jsonObject : JSONObject) : Uri {
+    val keys = jsonObject.keys()
+    var urlString :String? =null
+    var mediaType : String? = null
+    keys.forEach {
+        if(it.equals("media_type"))
+        {
+            mediaType = jsonObject.getString(it)
+        }
+
+        if(it.equals("url")&& mediaType=="image"){
+            urlString = jsonObject.getString(it)
+        }
+
+
+    }
+    return urlString?.toUri()?.buildUpon()?.scheme("https")!!?.build()
+}
 
 /*
 New parse method got from https://knowledge.udacity.com/questions/720081

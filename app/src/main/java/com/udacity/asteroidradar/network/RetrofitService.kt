@@ -30,6 +30,9 @@ private val retrofit = Retrofit.Builder()
                            @Query("API_KEY") key:String
                            ) : String
 
+        @GET("planetary/apod")
+        suspend fun getPicOfTheDay(@Query("api_key") key:String) : String
+
     }
     object AsteroidApi{
         val retrofitService : AsteroidApiService by lazy {
