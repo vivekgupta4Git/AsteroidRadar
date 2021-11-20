@@ -8,7 +8,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Asteroid(val id: Long,
-                    @Json(name="neo_reference_id")
                     val codename: String,
                     @Json(name ="close_approach_date") val closeApproachDate: String,
                     @Json(name="absolute_magnitude_h")val absoluteMagnitude: Double,

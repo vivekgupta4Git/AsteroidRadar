@@ -58,7 +58,10 @@ using coroutines
 
                     //as status is ok, we will retrieve pic of the day
               val string =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
-                _picOfTheDay.value = parsePicOfTheDay(JSONObject(string)).toString()
+                    val pictureOfDay = parsePicOfTheDay(JSONObject(string))
+                    if(pictureOfDay?.mediaType=="image")
+                _picOfTheDay.value = pictureOfDay.url
+
 
                 }catch (e : Exception)
                 {

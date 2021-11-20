@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
+import com.udacity.asteroidradar.PictureOfDay
 import org.json.JSONObject
 import java.lang.IllegalArgumentException
 import java.net.URL
@@ -17,23 +18,27 @@ import kotlin.collections.ArrayList
 /*
 parse method for pic of the day
  */
-fun parsePicOfTheDay(jsonObject : JSONObject) : Uri {
+fun parsePicOfTheDay(jsonObject : JSONObject): PictureOfDay? {
     val keys = jsonObject.keys()
     var urlString :String? =null
-    var mediaType : String? = null
+    var mediaType: String? = null
+    var title : String?=null
     keys.forEach {
-        if(it.equals("media_type"))
-        {
+            if(it=="media_type")
             mediaType = jsonObject.getString(it)
-        }
 
-        if(it.equals("url")&& mediaType=="image"){
+            if(it=="url")
             urlString = jsonObject.getString(it)
-        }
 
+            if(it=="title")
+            title = jsonObject.getString(it)
+                }
 
-    }
-    return urlString?.toUri()?.buildUpon()?.scheme("https")!!?.build()
+    if(mediaType!=null && urlString!=null && title!=null)
+        return PictureOfDay(mediaType!!, title!!, urlString!!)
+    else
+        return null
+    //return urlString?.toUri()?.buildUpon()?.scheme("https")!!?.build()
 }
 
 /*
