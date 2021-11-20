@@ -37,8 +37,7 @@ fun parsePicOfTheDay(jsonObject : JSONObject): PictureOfDay? {
     if(mediaType!=null && urlString!=null && title!=null)
         return PictureOfDay(mediaType!!, title!!, urlString!!)
     else
-        return null
-    //return urlString?.toUri()?.buildUpon()?.scheme("https")!!?.build()
+        return PictureOfDay("","","")
 }
 
 /*

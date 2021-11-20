@@ -2,6 +2,7 @@ package com.udacity.asteroidradar.main
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,13 +17,20 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
+
+enum class Asteroid_Status{
+    LOADING,
+    DONE,
+    ERROR
+}
 
 @RequiresApi(Build.VERSION_CODES.N)
 class MainViewModel : ViewModel() {
 
     //Encapsulated status Live Data variable
-    private var _status = MutableLiveData<String>()
-    val status : LiveData<String>
+    private var _status = MutableLiveData<Asteroid_Status>()
+    val status : LiveData<Asteroid_Status>
     get() = _status
 
 
@@ -31,30 +39,38 @@ class MainViewModel : ViewModel() {
     val pictureOfDay : LiveData<String>
     get() = _picOfTheDay
 
+    //Encapsulated List of Asteroid
+    private var _asteroidList = MutableLiveData<List<Asteroid>?>()
+    val asteroidList : LiveData<List<Asteroid>?>
+    get() = _asteroidList
+
     init {
         getResponse()
     }
 
-    private fun getResponse(){
     /*
-    I was getting error while parsing json response saying "expected begin_array but was begin_object"
+I was getting error while parsing json response saying "expected begin_array but was begin_object"
 
-    So, I used  provided parsing method but it also has bug
-    While searching for answer in udacity help center, I came across
-    https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
+So, I used  provided parsing method but it also has bug
+While searching for answer in udacity help center, I came across
+https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
 
-     */
-
-/*
-using coroutines
  */
+
+    private fun getResponse(){
+        _status.value = Asteroid_Status.LOADING
+//using coroutines
         viewModelScope.launch {
 
                 try {
-
+                    //using retrofit service
                     val asteroidResult: String =
                         AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
-                    _status.value = parseAsteroidsJsonResult(JSONObject(asteroidResult)).size.toString()
+                    //Getting parsed asteroid List
+                    _asteroidList.value = parseAsteroidsJsonResult(JSONObject(asteroidResult))
+                    Log.i("Asteroid","in View Model, parsed List " + _asteroidList.value.toString())
+                    _status.value = Asteroid_Status.DONE
+
 
                     //as status is ok, we will retrieve pic of the day
               val string =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
@@ -65,26 +81,14 @@ using coroutines
 
                 }catch (e : Exception)
                 {
-                    _status.value = "Failure" +e.message
+                    _asteroidList.value = ArrayList()
+                    _status.value = Asteroid_Status.ERROR
                 }
 
 
         }
- /*       //enqueue retrofit service
-            AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey).enqueue(object :Callback<String>{
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                        val jobject = response.body()?.let { JSONObject(it) }
-                        _status.value = jobject?.let { parseAsteroidsJsonResult(it).size.toString() }
-
-            }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                _status.value = t.message
-            }
-
-        })
-*/
     }
+
 
     @SuppressLint("NewApi")
     private  fun getTodayDate(): String {
@@ -95,7 +99,6 @@ using coroutines
         val simpleDateFormatter = 
             //but small y is accepted by IDE
             SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
-
 
         //returning Date as String
         return simpleDateFormatter.format(date)

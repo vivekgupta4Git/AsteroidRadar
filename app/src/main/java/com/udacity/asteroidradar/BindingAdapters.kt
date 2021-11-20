@@ -1,13 +1,25 @@
 package com.udacity.asteroidradar
 
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import com.udacity.asteroidradar.main.AsteroidAdapter
 import java.net.URI
 import java.net.URL
 
+
+@BindingAdapter("listData")
+fun bindRecylerView(recyclerView: RecyclerView,listOfAsteroids: List<Asteroid>?)
+{
+    Log.i("Asteroid","in BindingAdapter :" + listOfAsteroids.toString())
+     val   adapter = recyclerView.adapter as AsteroidAdapter
+        adapter.submitList(listOfAsteroids)
+
+}
 
 @BindingAdapter("imageUrl")
 fun bindToImageView(imageView: ImageView,url : String?)
