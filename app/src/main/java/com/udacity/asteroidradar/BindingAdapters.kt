@@ -1,15 +1,16 @@
 package com.udacity.asteroidradar
 
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.main.AsteroidAdapter
-import java.net.URI
-import java.net.URL
+import com.udacity.asteroidradar.main.Asteroid_Status
 
 
 @BindingAdapter("listData")
@@ -66,3 +67,35 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
     val context = textView.context
     textView.text = String.format(context.getString(R.string.km_s_unit_format), number)
 }
+
+
+@BindingAdapter("androidApiStatus")
+fun bindStatus(progressBar : ProgressBar, status : Asteroid_Status)
+{
+    when(status)
+    {
+        Asteroid_Status.LOADING ->
+        {
+            progressBar.visibility = View.VISIBLE
+            progressBar.progress = 50
+
+        }
+        Asteroid_Status.DONE ->
+        {
+            progressBar.visibility = View.GONE
+        }
+        Asteroid_Status.ERROR->
+        {
+            progressBar.visibility = View.VISIBLE
+            progressBar.progress = 0
+        }
+
+    }
+
+}
+
+
+
+
+
+

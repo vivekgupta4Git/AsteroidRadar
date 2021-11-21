@@ -7,7 +7,11 @@
         <variable
             name="asteroidProperty"
             type="com.udacity.asteroidradar.Asteroid" />
+        <variable
+            name="clickListener"
+            type="com.udacity.asteroidradar.main.AsteroidAdapter.OnClickListener" />
     </data>
+
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -39,6 +43,7 @@
             app:layout_constraintTop_toTopOf="@+id/textView2" />
 
         <ImageView
+            android:onClick="@{ ()-> clickListener.onClick(asteroidProperty)}"
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

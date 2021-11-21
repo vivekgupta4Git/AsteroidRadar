@@ -44,10 +44,26 @@ class MainViewModel : ViewModel() {
     val asteroidList : LiveData<List<Asteroid>?>
     get() = _asteroidList
 
+    //Encapsulated navigation
+    private var _navigateToDetailFragment = MutableLiveData<Asteroid>()
+    val navigateToDetailFrgament : LiveData<Asteroid>
+    get() = _navigateToDetailFragment
+
+
+
     init {
-        viewModelScope.launch {
             getResponse()
-        }
+
+
+    }
+
+    fun displayDetailFragment(asteroid: Asteroid){
+        _navigateToDetailFragment.value = asteroid
+    }
+
+    fun displayDetailFragmentComplete()
+    {
+        _navigateToDetailFragment.value = null
     }
 
     /*
@@ -59,7 +75,7 @@ https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
 
  */
 
-private suspend fun getResponse(){
+private fun getResponse(){
         _status.value = Asteroid_Status.LOADING
 //using coroutines
         viewModelScope.launch {
