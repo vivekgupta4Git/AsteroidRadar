@@ -1,5 +1,6 @@
 package com.udacity.asteroidradar.main
 
+import android.content.ClipData
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -21,11 +22,17 @@ class AsteroidAdapter : ListAdapter<Asteroid,AsteroidAdapter.AsteroidViewHolder>
 
 
     }
+
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): AsteroidViewHolder {
-    return AsteroidViewHolder(ItemViewBinding.inflate(LayoutInflater.from(parent.context)))
+
+
+        var inflater= LayoutInflater.from(parent.context)
+        var view = ItemViewBinding.inflate(inflater,parent,false)
+    return AsteroidViewHolder(view)
 
     }
 

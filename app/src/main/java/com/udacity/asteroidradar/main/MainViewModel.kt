@@ -45,7 +45,9 @@ class MainViewModel : ViewModel() {
     get() = _asteroidList
 
     init {
-        getResponse()
+        viewModelScope.launch {
+            getResponse()
+        }
     }
 
     /*
@@ -57,7 +59,7 @@ https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
 
  */
 
-    private fun getResponse(){
+private suspend fun getResponse(){
         _status.value = Asteroid_Status.LOADING
 //using coroutines
         viewModelScope.launch {
@@ -68,19 +70,24 @@ https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
                         AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
                     //Getting parsed asteroid List
                     _asteroidList.value = parseAsteroidsJsonResult(JSONObject(asteroidResult))
-                    Log.i("Asteroid","in View Model, parsed List " + _asteroidList.value.toString())
+                    //As we got the list , marking status as loading done
                     _status.value = Asteroid_Status.DONE
 
-
+                var responseString:String?=null
                     //as status is ok, we will retrieve pic of the day
-              val string =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
-                    val pictureOfDay = parsePicOfTheDay(JSONObject(string))
+                    if(status.value== Asteroid_Status.DONE)
+              responseString =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
+
+                    //getting parsed picture of the day
+                    val pictureOfDay = parsePicOfTheDay(JSONObject(responseString))
+                    //Show picture only if it's media type is image
                     if(pictureOfDay?.mediaType=="image")
                 _picOfTheDay.value = pictureOfDay.url
 
 
                 }catch (e : Exception)
                 {
+                    //setting list to empty
                     _asteroidList.value = ArrayList()
                     _status.value = Asteroid_Status.ERROR
                 }
