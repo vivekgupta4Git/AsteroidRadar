@@ -15,6 +15,7 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:onClick="@{ ()-> clickListener.onClick(asteroidProperty)}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -43,7 +44,6 @@
             app:layout_constraintTop_toTopOf="@+id/textView2" />
 
         <ImageView
-            android:onClick="@{ ()-> clickListener.onClick(asteroidProperty)}"
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

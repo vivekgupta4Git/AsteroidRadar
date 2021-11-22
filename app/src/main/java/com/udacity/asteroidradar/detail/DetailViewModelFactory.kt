@@ -7,13 +7,12 @@ import com.udacity.asteroidradar.Asteroid
 
 class DetailViewModelFactory(
     private val asteroid: Asteroid,
-    private val application: Application
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if(modelClass.isAssignableFrom(DetailViewModel::class.java))
         {
-            return DetailViewModel(asteroid,application) as T
+            return DetailViewModel(asteroid) as T
         }
         throw java.lang.IllegalArgumentException("Unknown Viewmodel class")
     }

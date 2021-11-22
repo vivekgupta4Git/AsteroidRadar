@@ -13,19 +13,26 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.material.snackbar.Snackbar
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
+import kotlinx.coroutines.channels.Channel
 
 class MainFragment : Fragment() {
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
-    }
+//    private val viewModel: MainViewModel by lazy {
+//        ViewModelProvider(this).get(MainViewModel::class.java)
+//    }
+//
 
-    @RequiresApi(Build.VERSION_CODES.N)
+    private lateinit var viewModel : MainViewModel
+
+   @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val binding = FragmentMainBinding.inflate(inflater)
         binding.lifecycleOwner = this
+       val application = requireNotNull(activity).application
 
+       val factory = MainViewModel.Factory(application)
+       viewModel = ViewModelProvider(this,factory).get(MainViewModel::class.java)
         binding.viewModel = viewModel
 
         val adapter = AsteroidAdapter(AsteroidAdapter.OnClickListener{

@@ -1,13 +1,11 @@
 package com.udacity.asteroidradar.main
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
@@ -15,6 +13,7 @@ import com.udacity.asteroidradar.api.parsePicOfTheDay
 import com.udacity.asteroidradar.network.AsteroidApi
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -26,7 +25,7 @@ enum class Asteroid_Status{
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //Encapsulated status Live Data variable
     private var _status = MutableLiveData<Asteroid_Status>()
@@ -127,4 +126,16 @@ private fun getResponse(){
         return simpleDateFormatter.format(date)
     }
 
+
+    class Factory(val application: Application) : ViewModelProvider.Factory{
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if(modelClass.isAssignableFrom(MainViewModel::class.java))
+                return MainViewModel(application) as T
+            throw
+                    IllegalArgumentException("Unknown viewmodel")
+        }
+
+    }
+
 }
+
