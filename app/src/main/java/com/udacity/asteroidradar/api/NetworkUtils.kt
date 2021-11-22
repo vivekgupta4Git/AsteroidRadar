@@ -6,6 +6,7 @@ import androidx.core.net.toUri
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
+import com.udacity.asteroidradar.network.NetworkAsteroidContainer
 import org.json.JSONObject
 import java.lang.IllegalArgumentException
 import java.net.URL
@@ -83,6 +84,8 @@ fun parseAsteroidsJsonResult(jsonObject: JSONObject): List<Asteroid> {
                 asteroidList.add(asteroid)
             }
         }
+
+
 
 
     return asteroidList

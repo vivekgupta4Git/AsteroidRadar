@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
+import kotlinx.coroutines.Deferred
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Retrofit

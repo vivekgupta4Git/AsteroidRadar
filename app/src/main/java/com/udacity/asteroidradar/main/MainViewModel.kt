@@ -45,8 +45,8 @@ class MainViewModel : ViewModel() {
     get() = _asteroidList
 
     //Encapsulated navigation
-    private var _navigateToDetailFragment = MutableLiveData<Asteroid>()
-    val navigateToDetailFrgament : LiveData<Asteroid>
+    private var _navigateToDetailFragment  = MutableLiveData<Asteroid?>()
+    val navigateToDetailFrgament : MutableLiveData<Asteroid?>
     get() = _navigateToDetailFragment
 
 
@@ -63,7 +63,7 @@ class MainViewModel : ViewModel() {
 
     fun displayDetailFragmentComplete()
     {
-        _navigateToDetailFragment.value = null
+        _navigateToDetailFragment.value  = null
     }
 
     /*
@@ -113,18 +113,19 @@ private fun getResponse(){
     }
 
 
-    @SuppressLint("NewApi")
-    private  fun getTodayDate(): String {
 
-        //getting instance of date
-        val date = Calendar.getInstance().time
-       //IDE suggested that Y pattern needs to first check for version
-        val simpleDateFormatter = 
-            //but small y is accepted by IDE
-            SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
+}
 
-        //returning Date as String
-        return simpleDateFormatter.format(date)
-    }
+@SuppressLint("NewApi")
+public  fun getTodayDate(): String {
 
+    //getting instance of date
+    val date = Calendar.getInstance().time
+    //IDE suggested that Y pattern needs to first check for version
+    val simpleDateFormatter =
+        //but small y is accepted by IDE
+        SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
+
+    //returning Date as String
+    return simpleDateFormatter.format(date)
 }
