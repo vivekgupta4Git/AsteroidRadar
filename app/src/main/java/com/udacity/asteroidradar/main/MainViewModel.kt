@@ -1,18 +1,18 @@
 package com.udacity.asteroidradar.main
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.api.parsePicOfTheDay
+import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.network.AsteroidApi
+import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -26,7 +26,7 @@ enum class Asteroid_Status{
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //Encapsulated status Live Data variable
     private var _status = MutableLiveData<Asteroid_Status>()
@@ -39,10 +39,6 @@ class MainViewModel : ViewModel() {
     val pictureOfDay : LiveData<String>
     get() = _picOfTheDay
 
-    //Encapsulated List of Asteroid
-    private var _asteroidList = MutableLiveData<List<Asteroid>?>()
-    val asteroidList : LiveData<List<Asteroid>?>
-    get() = _asteroidList
 
     //Encapsulated navigation
     private var _navigateToDetailFragment  = MutableLiveData<Asteroid?>()
@@ -50,12 +46,11 @@ class MainViewModel : ViewModel() {
     get() = _navigateToDetailFragment
 
 
+private val database = getDatabase(application)
+private val repository = AsteroidsRepository(database)
 
-    init {
-            getResponse()
 
-
-    }
+    init {getResponse()}
 
     fun displayDetailFragment(asteroid: Asteroid){
         _navigateToDetailFragment.value = asteroid
@@ -77,41 +72,39 @@ https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
 
 private fun getResponse(){
         _status.value = Asteroid_Status.LOADING
-//using coroutines
         viewModelScope.launch {
-
                 try {
-                    //using retrofit service
-                    val asteroidResult: String =
-                        AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
-                    //Getting parsed asteroid List
-                    _asteroidList.value = parseAsteroidsJsonResult(JSONObject(asteroidResult))
-                    //As we got the list , marking status as loading done
+                  repository.refreshAsteroidsList()
                     _status.value = Asteroid_Status.DONE
-
-                var responseString:String?=null
+                    var responseString:String?=null
                     //as status is ok, we will retrieve pic of the day
-                    if(status.value== Asteroid_Status.DONE)
-              responseString =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
-
+                  responseString =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
                     //getting parsed picture of the day
                     val pictureOfDay = parsePicOfTheDay(JSONObject(responseString))
                     //Show picture only if it's media type is image
                     if(pictureOfDay?.mediaType=="image")
                 _picOfTheDay.value = pictureOfDay.url
-
-
                 }catch (e : Exception)
                 {
-                    //setting list to empty
-                    _asteroidList.value = ArrayList()
                     _status.value = Asteroid_Status.ERROR
                 }
-
 
         }
     }
 
+    val asteroid = repository.asteroids
+
+
+    class Factory(val app: Application) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(AndroidViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return AndroidViewModel(app) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewmodel")
+
+        }
+    }
 
 
 }

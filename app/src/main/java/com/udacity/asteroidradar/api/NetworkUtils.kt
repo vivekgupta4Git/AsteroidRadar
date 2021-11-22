@@ -6,6 +6,8 @@ import androidx.core.net.toUri
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
+import com.udacity.asteroidradar.database.DatabaseAsteroid
+import com.udacity.asteroidradar.network.NetworkAsteroid
 import com.udacity.asteroidradar.network.NetworkAsteroidContainer
 import org.json.JSONObject
 import java.lang.IllegalArgumentException
@@ -45,8 +47,8 @@ fun parsePicOfTheDay(jsonObject : JSONObject): PictureOfDay? {
 New parse method got from https://knowledge.udacity.com/questions/720081
  */
 
-fun parseAsteroidsJsonResult(jsonObject: JSONObject): List<Asteroid> {
-    val asteroidList = mutableListOf<Asteroid>()
+fun parseAsteroidsJsonResult(jsonObject: JSONObject): List<DatabaseAsteroid> {
+    val asteroidList = mutableListOf<DatabaseAsteroid>()
     val nearEarthObjectsJson = jsonObject.getJSONObject("near_earth_objects")
     val dateList: MutableIterator<String> = nearEarthObjectsJson.keys()
 
@@ -71,7 +73,7 @@ fun parseAsteroidsJsonResult(jsonObject: JSONObject): List<Asteroid> {
                     .getDouble("astronomical")
                 val isPotentiallyHazardous = asteroidJson
                     .getBoolean("is_potentially_hazardous_asteroid")
-                val asteroid = Asteroid(
+                val asteroid = DatabaseAsteroid(
                     id,
                     codename,
                     key,

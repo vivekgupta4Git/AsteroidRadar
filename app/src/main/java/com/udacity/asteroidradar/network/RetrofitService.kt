@@ -29,7 +29,7 @@ private val retrofit = Retrofit.Builder()
         @GET("neo/rest/v1/feed")
      suspend  fun  getAsteroids( @Query("START_DATE") start: String,
                            @Query("API_KEY") key:String
-                           ) : String
+                           ) : Deferred<String>
 
         @GET("planetary/apod")
         suspend fun getPicOfTheDay(@Query("api_key") key:String) : String

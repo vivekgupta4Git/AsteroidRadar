@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import com.udacity.asteroidradar.main.getTodayDate
 import com.udacity.asteroidradar.network.NetworkAsteroid
 import com.udacity.asteroidradar.network.NetworkAsteroidContainer
+import kotlinx.coroutines.Deferred
 import org.json.JSONObject
 
 
@@ -29,12 +30,10 @@ class AsteroidsRepository(private val database : AsteroidRoomDatabase)
         withContext(Dispatchers.IO){
             //using retrofit service
             val asteroidResult: String =
-                AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
+                AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey).await()
             //Getting parsed asteroid List
             val asteroidList = parseAsteroidsJsonResult(JSONObject(asteroidResult))
-
-
-           // database.asteroidDao.insertAll()
+            database.asteroidDao.insertAll(*asteroidList.toTypedArray())
 
         }
     }
