@@ -6,7 +6,9 @@ import com.squareup.moshi.JsonClass
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.database.AsteroidEntity
 
-
+/*
+Could not find why this class is used.
+ */
 //@JsonClass(generateAdapter = true)
 //data class NetworkAsteroidContainer(val asteroids: List<NetworkAsteroid>)
 

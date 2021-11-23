@@ -3,6 +3,7 @@ package com.udacity.asteroidradar.main
 import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import androidx.room.RoomDatabase
@@ -12,6 +13,7 @@ import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.database.AsteroidDatabase
 import com.udacity.asteroidradar.network.AsteroidApi
+import com.udacity.asteroidradar.network.AsteroidFilter
 import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -63,8 +65,6 @@ We are not using this as we are separating this logic out of view model
 
     init {
             getResponse()
-
-
     }
 
     fun displayDetailFragment(asteroid: Asteroid){
@@ -91,7 +91,8 @@ private fun getResponse(){
         viewModelScope.launch {
         getPictureOfDay()
                 try {
-                    repo.refreshAsteroids()
+                    repo.getAsteroidBasedOnFilter(AsteroidFilter.SHOW_SAVED)
+                  //  repo.refreshAsteroids()
                     _status.value = Asteroid_Status.DONE
 
                 }catch (e : Exception)
@@ -119,6 +120,11 @@ Finally using Moshi to get picture of the day
 
     }
 
+
+    fun updateFilter(filter : AsteroidFilter){
+        Log.i("Asteriods","Recieved filter value =$filter")
+        repo.getAsteroidBasedOnFilter(filter)
+    }
 
 
 

@@ -7,4 +7,13 @@
     <color name="default_text_color">#FFFFFF</color>
     <color name="text_grey">#D2D2D2</color>
     <color name="potentially_hazardous">#FF8282</color>
-</resources>
+
+    <color name="primaryColor">#01579b</color>
+        <color name="primaryLightColor">#4f83cc</color>
+        <color name="primaryDarkColor">#002f6c</color>
+        <color name="secondaryColor">#76ff03</color>
+        <color name="secondaryLightColor">#b0ff57</color>
+        <color name="secondaryDarkColor">#32cb00</color>
+        <color name="primaryTextColor">#ffffff</color>
+        <color name="secondaryTextColor">#000000</color>
+    </resources>

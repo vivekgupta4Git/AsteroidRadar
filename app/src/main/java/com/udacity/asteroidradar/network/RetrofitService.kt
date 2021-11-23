@@ -11,6 +11,15 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 
+//Creating filter
+public enum class AsteroidFilter(val value : String){
+
+    SHOW_SAVED("saved"),
+    SHOW_TODAY("today"),
+    SHOW_WEEKLY("week")
+}
+
+
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
     .build()

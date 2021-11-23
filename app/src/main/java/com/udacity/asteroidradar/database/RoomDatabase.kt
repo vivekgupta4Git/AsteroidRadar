@@ -9,11 +9,24 @@ import kotlinx.parcelize.Parcelize
 
 @Dao
 interface AsteroidDao{
+
+  //this can be used to show menu item for saved
+  //get all asteroids from database sorted by date.
 @Query("Select * from asteroid_table Order by closeApproachDate")
 fun getAsteroids() :LiveData< List<AsteroidEntity>>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
    fun insertAll(vararg asteroids : AsteroidEntity)
+
+  //get asteroids for menu item weekly
+  @Query("SELECT * FROM asteroid_table WHERE date(closeApproachDate) BETWEEN date('now') AND date('now','+7 days') ORDER BY date(closeApproachDate) ASC")
+  fun getWeeklyAsteroids(): LiveData<List<AsteroidEntity>>
+
+
+  //For menu item , Today
+  @Query("SELECT * FROM asteroid_table WHERE date(closeApproachDate)=date('now')")
+  fun getTodayAsteroid(): LiveData<List<AsteroidEntity>>
+
 
   @Query("DELETE FROM asteroid_table ")
   fun clear()
