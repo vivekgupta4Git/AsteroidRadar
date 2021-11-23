@@ -80,7 +80,6 @@ fun bindStatus(progressBar : ProgressBar, status : Asteroid_Status)
         Asteroid_Status.LOADING ->
         {
             progressBar.visibility = View.VISIBLE
-            progressBar.progress = 50
 
         }
         Asteroid_Status.DONE ->
@@ -90,7 +89,6 @@ fun bindStatus(progressBar : ProgressBar, status : Asteroid_Status)
         Asteroid_Status.ERROR->
         {
             progressBar.visibility = View.VISIBLE
-            progressBar.progress = 0
         }
 
     }

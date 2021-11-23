@@ -91,17 +91,11 @@ private fun getResponse(){
         viewModelScope.launch {
         getPictureOfDay()
                 try {
-
                     repo.refreshAsteroids()
-     /*               val asteroidResult: String =
-                        AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
-                    _asteroidList.value = parseAsteroidsJsonResult(JSONObject(asteroidResult))
-     */               _status.value = Asteroid_Status.DONE
+                    _status.value = Asteroid_Status.DONE
 
                 }catch (e : Exception)
                 {
-                    //setting list to empty
-       //             _asteroidList.value = ArrayList()
                     _status.value = Asteroid_Status.ERROR
                 }
 
@@ -153,4 +147,16 @@ fun getTodayDate(): String {
     return simpleDateFormatter.format(date)
 }
 
+@SuppressLint("NewApi")
+fun getDateAfterSevenDaysFromToday(): String{
 
+
+    //getting instance of date
+    val date = Calendar.getInstance().time
+    val cal = Calendar.getInstance()
+
+    val simpleDateFormatter = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT,Locale.getDefault())
+    cal.time = simpleDateFormatter.parse(date.toString())
+    cal.add(Calendar.DATE,7)
+        return simpleDateFormatter.format(cal.time)
+}

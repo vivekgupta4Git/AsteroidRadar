@@ -5,6 +5,7 @@ import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.database.AsteroidEntity
+import com.udacity.asteroidradar.network.NetworkAsteroid
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -41,8 +42,8 @@ fun parsePicOfTheDay(jsonObject : JSONObject): PictureOfDay? {
 New parse method got from https://knowledge.udacity.com/questions/720081
  */
 
-fun parseAsteroidsJsonResult(jsonObject: JSONObject): List<Asteroid> {
-    val asteroidList = mutableListOf<Asteroid>()
+fun parseAsteroidsJsonResult(jsonObject: JSONObject): List<NetworkAsteroid> {
+    val asteroidList = mutableListOf<NetworkAsteroid>()
     val nearEarthObjectsJson = jsonObject.getJSONObject("near_earth_objects")
     val dateList: MutableIterator<String> = nearEarthObjectsJson.keys()
 
@@ -67,7 +68,7 @@ fun parseAsteroidsJsonResult(jsonObject: JSONObject): List<Asteroid> {
                     .getDouble("astronomical")
                 val isPotentiallyHazardous = asteroidJson
                     .getBoolean("is_potentially_hazardous_asteroid")
-                val asteroid = Asteroid(
+                val asteroid = NetworkAsteroid(
                     id,
                     codename,
                     key,
@@ -83,8 +84,12 @@ fun parseAsteroidsJsonResult(jsonObject: JSONObject): List<Asteroid> {
 
 
     return asteroidList
+
 }
 
+/*
+modifying above parse method to make it compatible with my project
+ */
 fun parseAsteroidsJsonResultToDatabaseModel(jsonObject: JSONObject): List<AsteroidEntity> {
     val asteroidList = mutableListOf<AsteroidEntity>()
     val nearEarthObjectsJson = jsonObject.getJSONObject("near_earth_objects")
