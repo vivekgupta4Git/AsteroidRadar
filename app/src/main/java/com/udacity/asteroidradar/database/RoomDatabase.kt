@@ -2,8 +2,10 @@ package com.udacity.asteroidradar.database
 
 import android.content.Context
 import android.os.Parcelable
+import androidx.annotation.Nullable
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.udacity.asteroidradar.Asteroid
 import kotlinx.parcelize.Parcelize
 
 
@@ -20,19 +22,33 @@ data class AsteroidEntity(
                           val distanceFromEarth: Double,
                           val isPotentiallyHazardous: Boolean) : Parcelable
 
+fun List<AsteroidEntity>.asDomainModel() : List<Asteroid>{
+  return map {
+    Asteroid(
+      id = it.id,
+      codename = it.codename,
+      closeApproachDate = it.closeApproachDate,
+      absoluteMagnitude = it.absoluteMagnitude,
+      estimatedDiameter = it.estimatedDiameter,
+      relativeVelocity = it.relativeVelocity,
+      distanceFromEarth = it.distanceFromEarth,
+      isPotentiallyHazardous = it.isPotentiallyHazardous
+    )
+  }
+}
+
 @Dao
 interface AsteroidDao{
 @Query("Select * from asteroid_table Order by closeApproachDate")
-fun get() : List<AsteroidEntity>?
+ fun get() : LiveData<List<AsteroidEntity>>
 
-  @Insert
-   fun insert(asteroid : AsteroidEntity)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+ suspend  fun insert(vararg asteroid : AsteroidEntity)
 
-  @Query("DELETE FROM asteroid_table ")
-  fun clear()
+
 }
 
-@Database(entities = [AsteroidEntity::class],version = 1,exportSchema = false)
+@Database(entities = [AsteroidEntity::class],version = 2,exportSchema = false)
 abstract class AsteroidDatabase : RoomDatabase(){
 
   abstract val asteroidDao : AsteroidDao

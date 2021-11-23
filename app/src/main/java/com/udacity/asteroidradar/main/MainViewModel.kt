@@ -9,8 +9,10 @@ import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
+import com.udacity.asteroidradar.Repository.AsteroidRepository
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.api.parsePicOfTheDay
+import com.udacity.asteroidradar.database.AsteroidDatabase.Companion.getInstance
 import com.udacity.asteroidradar.network.AsteroidApi
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -39,10 +41,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val pictureOfDay : LiveData<PictureOfDay>
     get() = _picOfTheDay
 
+/*
     //Encapsulated List of Asteroid
     private var _asteroidList = MutableLiveData<List<Asteroid>?>()
     val asteroidList : LiveData<List<Asteroid>?>
     get() = _asteroidList
+*/
 
     //Encapsulated navigation
     private var _navigateToDetailFragment = MutableLiveData<Asteroid>()
@@ -75,21 +79,28 @@ https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
 
  */
 
+    private val database = getInstance(application)
+    private val repository = AsteroidRepository(database)
+
+
 private fun getResponse(){
         _status.value = Asteroid_Status.LOADING
 
         viewModelScope.launch {
         getPictureOfDay()
                 try {
-                    val asteroidResult: String =
+                        repository.refreshAsteroidList()
+
+                  /*  val asteroidResult=
                         AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
                     _asteroidList.value = parseAsteroidsJsonResult(JSONObject(asteroidResult))
+                 */
                     _status.value = Asteroid_Status.DONE
 
                 }catch (e : Exception)
                 {
                     //setting list to empty
-                    _asteroidList.value = ArrayList()
+              //      _asteroidList.value = ArrayList()
                     _status.value = Asteroid_Status.ERROR
                 }
 
@@ -97,7 +108,9 @@ private fun getResponse(){
         }
     }
 
-/*
+    val asteroidList = repository.asteroid
+
+    /*
 Finally using Moshi to get picture of the day
  */
     private suspend fun getPictureOfDay(){
@@ -109,7 +122,7 @@ Finally using Moshi to get picture of the day
 
 
     @SuppressLint("NewApi")
-    private  fun getTodayDate(): String {
+    public  fun getTodayDate(): String {
 
         //getting instance of date
         val date = Calendar.getInstance().time
