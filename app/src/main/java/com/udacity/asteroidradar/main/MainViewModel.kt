@@ -5,11 +5,14 @@ import android.app.Application
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
+import androidx.room.RoomDatabase
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.database.AsteroidDatabase
 import com.udacity.asteroidradar.network.AsteroidApi
+import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.lang.IllegalArgumentException
@@ -36,11 +39,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var _picOfTheDay = MutableLiveData<PictureOfDay>()
     val pictureOfDay : LiveData<PictureOfDay>
     get() = _picOfTheDay
-
+/*
+We are not using this as we are separating this logic out of view model
     //Encapsulated List of Asteroid
     private var _asteroidList = MutableLiveData<List<Asteroid>?>()
     val asteroidList : LiveData<List<Asteroid>?>
     get() = _asteroidList
+*/
+
+    /*
+    creating repo
+     */
+   private val database = AsteroidDatabase.getInstance(application)
+    private val repo = AsteroidsRepository(database)
+
 
     //Encapsulated navigation
     private var _navigateToDetailFragment = MutableLiveData<Asteroid>()
@@ -79,21 +91,29 @@ private fun getResponse(){
         viewModelScope.launch {
         getPictureOfDay()
                 try {
-                    val asteroidResult: String =
+
+                    repo.refreshAsteroids()
+     /*               val asteroidResult: String =
                         AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
                     _asteroidList.value = parseAsteroidsJsonResult(JSONObject(asteroidResult))
-                    _status.value = Asteroid_Status.DONE
+     */               _status.value = Asteroid_Status.DONE
 
                 }catch (e : Exception)
                 {
                     //setting list to empty
-                    _asteroidList.value = ArrayList()
+       //             _asteroidList.value = ArrayList()
                     _status.value = Asteroid_Status.ERROR
                 }
 
 
         }
     }
+
+    /*
+    As repo is created, use repo to get list of asteroids.
+    Same variable name as used previously, so we don't need to change in res folder
+     */
+    val asteroidList = repo.asteroids
 
 /*
 Finally using Moshi to get picture of the day
