@@ -3,14 +3,12 @@ package com.udacity.asteroidradar.main
 import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
-import com.udacity.asteroidradar.api.parsePicOfTheDay
 import com.udacity.asteroidradar.network.AsteroidApi
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -108,19 +106,6 @@ Finally using Moshi to get picture of the day
     }
 
 
-    @SuppressLint("NewApi")
-    private  fun getTodayDate(): String {
-
-        //getting instance of date
-        val date = Calendar.getInstance().time
-       //IDE suggested that Y pattern needs to first check for version
-        val simpleDateFormatter = 
-            //but small y is accepted by IDE
-            SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
-
-        //returning Date as String
-        return simpleDateFormatter.format(date)
-    }
 
 
     class Factory(val application: Application) : ViewModelProvider.Factory{
@@ -134,4 +119,18 @@ Finally using Moshi to get picture of the day
     }
 
 }
+@SuppressLint("NewApi")
+fun getTodayDate(): String {
+
+    //getting instance of date
+    val date = Calendar.getInstance().time
+    //IDE suggested that Y pattern needs to first check for version
+    val simpleDateFormatter =
+        //but small y is accepted by IDE
+        SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
+
+    //returning Date as String
+    return simpleDateFormatter.format(date)
+}
+
 

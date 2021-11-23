@@ -15,6 +15,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import java.io.IOException
 
+/*
 @RunWith(AndroidJUnit4::class)
 class AsteroidDatabaseTest {
     private lateinit var asteroidDao: AsteroidDao
@@ -45,4 +46,4 @@ class AsteroidDatabaseTest {
         assertEquals(list?.size,1)
     }
 
-}
+}*/
