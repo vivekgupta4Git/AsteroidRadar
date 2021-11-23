@@ -1,9 +1,8 @@
 package com.udacity.asteroidradar.database
 
-import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.parcelize.Parcelize
+import com.udacity.asteroidradar.Asteroid
 
 @Entity(tableName = "asteroid_table")
 data class AsteroidEntity(
@@ -17,4 +16,18 @@ data class AsteroidEntity(
     val distanceFromEarth: Double,
     val isPotentiallyHazardous: Boolean)
 
-
+//Extension function to convert data transfer object to domain
+public fun List<AsteroidEntity>.asDomainModel() : List<Asteroid>{
+    return map {
+        Asteroid(
+            id = it.id,
+            codename = it.codename,
+            closeApproachDate = it.closeApproachDate,
+            absoluteMagnitude = it.absoluteMagnitude,
+            estimatedDiameter = it.estimatedDiameter,
+            relativeVelocity = it.relativeVelocity,
+            distanceFromEarth = it.distanceFromEarth,
+            isPotentiallyHazardous = it.isPotentiallyHazardous
+        )
+    }
+}

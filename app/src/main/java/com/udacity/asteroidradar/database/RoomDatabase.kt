@@ -10,10 +10,10 @@ import kotlinx.parcelize.Parcelize
 @Dao
 interface AsteroidDao{
 @Query("Select * from asteroid_table Order by closeApproachDate")
-fun get() : List<AsteroidEntity>?
+fun getAsteroids() :LiveData< List<AsteroidEntity>>
 
-  @Insert
-   fun insert(asteroid : AsteroidEntity)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+   fun insertAll(vararg asteroids : AsteroidEntity)
 
   @Query("DELETE FROM asteroid_table ")
   fun clear()
