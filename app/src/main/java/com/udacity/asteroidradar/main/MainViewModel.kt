@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
+import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.api.parsePicOfTheDay
 import com.udacity.asteroidradar.network.AsteroidApi
@@ -34,8 +35,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
     //Encapsulated pic of the day variable
-    private var _picOfTheDay = MutableLiveData<String>()
-    val pictureOfDay : LiveData<String>
+    private var _picOfTheDay = MutableLiveData<PictureOfDay>()
+    val pictureOfDay : LiveData<PictureOfDay>
     get() = _picOfTheDay
 
     //Encapsulated List of Asteroid
@@ -76,29 +77,14 @@ https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
 
 private fun getResponse(){
         _status.value = Asteroid_Status.LOADING
-//using coroutines
-        viewModelScope.launch {
 
+        viewModelScope.launch {
+        getPictureOfDay()
                 try {
-                    //using retrofit service
                     val asteroidResult: String =
                         AsteroidApi.retrofitService.getAsteroids(getTodayDate(),Constants.apikey)
-                    //Getting parsed asteroid List
                     _asteroidList.value = parseAsteroidsJsonResult(JSONObject(asteroidResult))
-                    //As we got the list , marking status as loading done
                     _status.value = Asteroid_Status.DONE
-
-                var responseString:String?=null
-                    //as status is ok, we will retrieve pic of the day
-                    if(status.value== Asteroid_Status.DONE)
-              responseString =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
-
-                    //getting parsed picture of the day
-                    val pictureOfDay = parsePicOfTheDay(JSONObject(responseString))
-                    //Show picture only if it's media type is image
-                    if(pictureOfDay?.mediaType=="image")
-                _picOfTheDay.value = pictureOfDay.url
-
 
                 }catch (e : Exception)
                 {
@@ -109,6 +95,16 @@ private fun getResponse(){
 
 
         }
+    }
+
+/*
+Finally using Moshi to get picture of the day
+ */
+    private suspend fun getPictureOfDay(){
+        val    responseObject =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
+        if(responseObject?.mediaType=="image")
+            _picOfTheDay.value = responseObject
+
     }
 
 

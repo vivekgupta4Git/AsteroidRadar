@@ -4,6 +4,8 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
+import com.udacity.asteroidradar.PictureOfDay
+import kotlinx.coroutines.Deferred
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -20,7 +22,7 @@ private val moshi = Moshi.Builder()
 
 private val retrofit = Retrofit.Builder()
         .addConverterFactory(ScalarsConverterFactory.create())
- //   .addConverterFactory(MoshiConverterFactory.create(moshi))
+    .addConverterFactory(MoshiConverterFactory.create(moshi))
         .baseUrl(Constants.BASE_URL)
         .build()
 
@@ -31,7 +33,7 @@ private val retrofit = Retrofit.Builder()
                            ) : String
 
         @GET("planetary/apod")
-        suspend fun getPicOfTheDay(@Query("api_key") key:String) : String
+        suspend fun getPicOfTheDay(@Query("api_key") key:String) : PictureOfDay
 
     }
     object AsteroidApi{

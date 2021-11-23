@@ -28,7 +28,10 @@ fun bindToImageView(imageView: ImageView,url : String?)
 
     url?.let {
         val imgUri = it.toUri().buildUpon().scheme("https").build()
-        Picasso.with(imageView.context).load(imgUri).into(imageView)
+        Picasso.with(imageView.context).
+        load(imgUri)
+            .error(R.drawable.ic_baseline_broken_image_24)
+            .into(imageView)
     }
 }
 
