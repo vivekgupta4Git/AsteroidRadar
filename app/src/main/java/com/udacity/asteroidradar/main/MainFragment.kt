@@ -73,7 +73,6 @@ private lateinit var asteroidListAdapter: AsteroidAdapter
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         viewModel.updateFilter(when(item.itemId){
             R.id.show_saved-> AsteroidFilter.SHOW_SAVED
-
             R.id.show_today -> AsteroidFilter.SHOW_TODAY
             else-> AsteroidFilter.SHOW_WEEKLY
         }

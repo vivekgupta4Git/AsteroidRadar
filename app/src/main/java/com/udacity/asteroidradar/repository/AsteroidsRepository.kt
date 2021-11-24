@@ -52,15 +52,13 @@ val asteroids : LiveData<List<Asteroid>> =
 
     suspend fun refreshAsteroids(){
         withContext(Dispatchers.IO){
-            val responseString =
-                AsteroidApi.retrofitService.getAsteroids(getTodayDate(),
-                    getDateAfterSevenDaysFromToday() ,Constants.apikey)
-        /*   val list = parseAsteroidsJsonResultToDatabaseModel(JSONObject(responseString))
-            database.asteroidDao.insertAll(*list.toTypedArray())
-*/
-//Network object to database object
+            val responseString = AsteroidApi.retrofitService.getAsteroids(getTodayDate(),
+                                                                            getDateAfterSevenDaysFromToday()
+                                                                                    ,Constants.apikey)
+//parsing response String
 val list = parseAsteroidsJsonResult(JSONObject(responseString))
-database.asteroidDao.insertAll(*list.asDatabaseModel())
+//Network object to database object
+            database.asteroidDao.insertAll(*list.asDatabaseModel())
         }
     }
 

@@ -19,12 +19,12 @@ fun getAsteroids() :LiveData< List<AsteroidEntity>>
    fun insertAll(vararg asteroids : AsteroidEntity)
 
   //get asteroids for menu item weekly
-  @Query("SELECT * FROM asteroid_table WHERE date(closeApproachDate) BETWEEN date('now') AND date('now','+7 days') ORDER BY date(closeApproachDate) ASC")
+  @Query("SELECT * FROM asteroid_table WHERE closeApproachDate BETWEEN date('now') AND date('now','+7 days') ORDER BY closeApproachDate ASC")
   fun getWeeklyAsteroids(): LiveData<List<AsteroidEntity>>
 
 
   //For menu item , Today
-  @Query("SELECT * FROM asteroid_table WHERE date(closeApproachDate)=date('now')")
+  @Query("SELECT * FROM asteroid_table WHERE closeApproachDate=date('now')")
   fun getTodayAsteroid(): LiveData<List<AsteroidEntity>>
 
 

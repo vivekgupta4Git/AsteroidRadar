@@ -64,7 +64,8 @@ We are not using this as we are separating this logic out of view model
 
 
     init {
-            getResponse()
+        repo.getAsteroidBasedOnFilter(AsteroidFilter.SHOW_SAVED)
+        getResponse()
     }
 
     fun displayDetailFragment(asteroid: Asteroid){
@@ -85,14 +86,16 @@ https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
 
  */
 
+
+
 private fun getResponse(){
         _status.value = Asteroid_Status.LOADING
 
         viewModelScope.launch {
         getPictureOfDay()
                 try {
-                    repo.getAsteroidBasedOnFilter(AsteroidFilter.SHOW_SAVED)
-                  //  repo.refreshAsteroids()
+                   repo.getAsteroidBasedOnFilter(AsteroidFilter.SHOW_SAVED)
+                    repo.refreshAsteroids()
                     _status.value = Asteroid_Status.DONE
 
                 }catch (e : Exception)
@@ -122,7 +125,7 @@ Finally using Moshi to get picture of the day
 
 
     fun updateFilter(filter : AsteroidFilter){
-        Log.i("Asteriods","Recieved filter value =$filter")
+        Log.i("Asteriod","Recieved filter value =$filter")
         repo.getAsteroidBasedOnFilter(filter)
     }
 
@@ -155,14 +158,12 @@ fun getTodayDate(): String {
 
 @SuppressLint("NewApi")
 fun getDateAfterSevenDaysFromToday(): String{
+val calendar  = Calendar.getInstance()
+    //was getting error in response from server when adding 7 days instead using 5 days
+    calendar.add(Calendar.DATE,5)
+    val date: Date = calendar.time
+    val formatter = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT)
+    val dateString = formatter.format(date)
 
-
-    //getting instance of date
-    val date = Calendar.getInstance().time
-    val cal = Calendar.getInstance()
-
-    val simpleDateFormatter = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT,Locale.getDefault())
-    cal.time = simpleDateFormatter.parse(date.toString())
-    cal.add(Calendar.DATE,7)
-        return simpleDateFormatter.format(cal.time)
+    return dateString
 }
