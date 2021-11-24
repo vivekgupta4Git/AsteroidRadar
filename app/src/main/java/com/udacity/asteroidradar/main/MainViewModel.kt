@@ -10,22 +10,28 @@ import androidx.room.RoomDatabase
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
-import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.database.AsteroidDatabase
 import com.udacity.asteroidradar.network.AsteroidApi
-import com.udacity.asteroidradar.network.AsteroidFilter
 import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
-import org.json.JSONObject
+import retrofit2.HttpException
 import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 enum class Asteroid_Status{
     LOADING,
     DONE,
     ERROR
+}
+/*
+Copied from knowledge center
+ */
+enum class MenuItemFilter(val value:String){
+    SHOW_WEEK("week"),
+    SHOW_TODAY("today"),
+    SAVED("saved")
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -41,13 +47,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var _picOfTheDay = MutableLiveData<PictureOfDay>()
     val pictureOfDay : LiveData<PictureOfDay>
     get() = _picOfTheDay
-/*
-We are not using this as we are separating this logic out of view model
+
+    //menu
+    private val _menuItem = MutableLiveData<MenuItemFilter>()
+    private val menuItem:LiveData<MenuItemFilter>
+    get() = _menuItem
+
+
+
     //Encapsulated List of Asteroid
     private var _asteroidList = MutableLiveData<List<Asteroid>?>()
     val asteroidList : LiveData<List<Asteroid>?>
     get() = _asteroidList
-*/
+
 
     /*
     creating repo
@@ -62,11 +74,27 @@ We are not using this as we are separating this logic out of view model
     get() = _navigateToDetailFragment
 
 
+    /*
+    copied from knowledege center to make recycler view update filter.
+     */
+    private val asteroidListObserver = androidx.lifecycle.Observer<List<Asteroid>>{
+        //update new list to recycler view
+        _asteroidList.value = it
+    }
+
+    private  var asteroidListLiveData : LiveData<List<Asteroid>>
 
     init {
-        repo.getAsteroidBasedOnFilter(AsteroidFilter.SHOW_SAVED)
-        getResponse()
+        /*
+      line->  THIS IS NOT MY CODE, USING SOLUTION FROM KNOWLEDGE CENTER
+         */
+   /* line 1*/     asteroidListLiveData = repo.getAsteroidBasedOnFilter(MenuItemFilter.SAVED)
+   /*line 2*/     asteroidListLiveData.observeForever(asteroidListObserver)
+
+            getResponse()
     }
+
+
 
     fun displayDetailFragment(asteroid: Asteroid){
         _navigateToDetailFragment.value = asteroid
@@ -88,48 +116,66 @@ https://knowledge.udacity.com/questions/720081 which gave my answer so using it.
 
 
 
-private fun getResponse(){
-        _status.value = Asteroid_Status.LOADING
+private  fun getResponse() {
+try {
+    viewModelScope.launch {
+        try {
+            _status.value = Asteroid_Status.LOADING
+            getPictureOfDay()
+            repo.refreshAsteroids()
+            repo.getAsteroidBasedOnFilter(MenuItemFilter.SAVED)
 
-        viewModelScope.launch {
-        getPictureOfDay()
-                try {
-                   repo.getAsteroidBasedOnFilter(AsteroidFilter.SHOW_SAVED)
-                    repo.refreshAsteroids()
-                    _status.value = Asteroid_Status.DONE
+            _status.value = Asteroid_Status.DONE
 
-                }catch (e : Exception)
-                {
-                    _status.value = Asteroid_Status.ERROR
-                }
-
-
+        } catch (e: HttpException) {
+            Log.e("Asteroid", "getResponse Method->" + e.toString())
+            _status.value = Asteroid_Status.ERROR
         }
     }
 
-    /*
-    As repo is created, use repo to get list of asteroids.
-    Same variable name as used previously, so we don't need to change in res folder
-     */
-    val asteroidList = repo.asteroids
+}catch (e : Exception)
+{
+    _status.value = Asteroid_Status.ERROR
+}
+
+}
+
 
 /*
 Finally using Moshi to get picture of the day
  */
     private suspend fun getPictureOfDay(){
-        val    responseObject =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
-        if(responseObject?.mediaType=="image")
-            _picOfTheDay.value = responseObject
+    try {
+
+        viewModelScope.launch {
+            try {
+                val    responseObject =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
+                if(responseObject?.mediaType=="image")
+                    _picOfTheDay.value = responseObject
+
+            }   catch (e : HttpException){
+                Log.e("Asteroid","Inside of getPictureOfDay Method->" +e.toString())
+            }
+        }
+
+
+    }catch (e : Exception){
 
     }
 
 
-    fun updateFilter(filter : AsteroidFilter){
-        Log.i("Asteriod","Recieved filter value =$filter")
-        repo.getAsteroidBasedOnFilter(filter)
     }
 
 
+    fun updateFilter(filter : MenuItemFilter){
+        asteroidListLiveData = repo.getAsteroidBasedOnFilter(filter)
+        asteroidListLiveData.observeForever(asteroidListObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        asteroidListLiveData.removeObserver(asteroidListObserver)
+    }
 
     class Factory(val application: Application) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
