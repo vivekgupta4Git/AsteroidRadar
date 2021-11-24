@@ -9,21 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import com.google.android.material.snackbar.Snackbar
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
-import com.udacity.asteroidradar.network.AsteroidFilter
-import kotlinx.coroutines.channels.Channel
 
 class MainFragment : Fragment() {
-
-    /*
-    using solution of Recycler view update list
-    https://knowledge.udacity.com/questions/577992
-     */
-// Declare an adapter for submitting list later
-private lateinit var asteroidListAdapter: AsteroidAdapter
 
     private lateinit var binding: FragmentMainBinding
 
@@ -40,15 +29,12 @@ private lateinit var asteroidListAdapter: AsteroidAdapter
        viewModel = ViewModelProvider(this,factory).get(MainViewModel::class.java)
         binding.viewModel = viewModel
 
-       //using solution from knowledge center ->https://knowledge.udacity.com/questions/577992
         val adapter = AsteroidAdapter(AsteroidAdapter.OnClickListener{
             viewModel.displayDetailFragment(it)
-        }).apply {
-            asteroidListAdapter = this
-        }
+        })
 
         binding.asteroidRecycler.adapter = adapter
-       binding.asteroidRecycler.addItemDecoration(DividerItemDecoration(context,DividerItemDecoration.VERTICAL))
+   //    binding.asteroidRecycler.addItemDecoration(DividerItemDecoration(context,DividerItemDecoration.VERTICAL))
 
         viewModel.navigateToDetailFrgament.observe(viewLifecycleOwner, Observer {
             if(null!= it)
@@ -72,18 +58,13 @@ private lateinit var asteroidListAdapter: AsteroidAdapter
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         viewModel.updateFilter(when(item.itemId){
-            R.id.show_saved-> AsteroidFilter.SHOW_SAVED
-            R.id.show_today -> AsteroidFilter.SHOW_TODAY
-            else-> AsteroidFilter.SHOW_WEEKLY
+            R.id.show_saved-> MenuItemFilter.SAVED
+            R.id.show_today -> MenuItemFilter.SHOW_TODAY
+            else-> MenuItemFilter.SHOW_WEEK
         }
         )
-ObserveList()
         return true
     }
 
-    private fun ObserveList(){
-        viewModel.asteroidList.observe(viewLifecycleOwner, Observer {
-            asteroidListAdapter.submitList(it)
-        })
-    }
+
 }

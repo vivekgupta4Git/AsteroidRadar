@@ -16,7 +16,6 @@ import com.udacity.asteroidradar.main.Asteroid_Status
 @BindingAdapter("listData")
 fun bindRecylerView(recyclerView: RecyclerView,listOfAsteroids: List<Asteroid>?)
 {
-    Log.i("Asteroid","in BindingAdapter :" + listOfAsteroids.toString())
      val   adapter = recyclerView.adapter as AsteroidAdapter
         adapter.submitList(listOfAsteroids)
 
