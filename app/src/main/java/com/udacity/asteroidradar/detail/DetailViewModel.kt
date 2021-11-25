@@ -16,8 +16,11 @@ class DetailViewModel(asteroid: Asteroid) :ViewModel(){
         _selectedAsteroid.value = asteroid
     }
 
+
 }
+
 /*
+//We don't need application scope here..
 class DetailViewModel(asteroid: Asteroid,application: Application) :ViewModel(){
 
     //Encapsulated selected Asteroid

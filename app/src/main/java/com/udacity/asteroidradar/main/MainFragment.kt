@@ -33,6 +33,7 @@ class MainFragment : Fragment() {
             viewModel.displayDetailFragment(it)
         })
 
+
         binding.asteroidRecycler.adapter = adapter
    //    binding.asteroidRecycler.addItemDecoration(DividerItemDecoration(context,DividerItemDecoration.VERTICAL))
 

@@ -6,6 +6,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import androidx.room.RoomDatabase
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
@@ -89,6 +90,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
       line->  THIS IS NOT MY CODE, USING SOLUTION FROM KNOWLEDGE CENTER
          */
    /* line 1*/     asteroidListLiveData = repo.getAsteroidBasedOnFilter(MenuItemFilter.SAVED)
+
    /*line 2*/     asteroidListLiveData.observeForever(asteroidListObserver)
 
             getResponse()
@@ -127,7 +129,7 @@ try {
 
             _status.value = Asteroid_Status.DONE
 
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
             Log.e("Asteroid", "getResponse Method->" + e.toString())
             _status.value = Asteroid_Status.ERROR
         }
@@ -150,10 +152,13 @@ Finally using Moshi to get picture of the day
         viewModelScope.launch {
             try {
                 val    responseObject =  AsteroidApi.retrofitService.getPicOfTheDay(Constants.apikey)
-                if(responseObject?.mediaType=="image")
-                    _picOfTheDay.value = responseObject
 
-            }   catch (e : HttpException){
+                if(responseObject?.mediaType=="image")
+                {
+                    _picOfTheDay.value = responseObject
+                }
+
+            }   catch (e : Exception){
                 Log.e("Asteroid","Inside of getPictureOfDay Method->" +e.toString())
             }
         }

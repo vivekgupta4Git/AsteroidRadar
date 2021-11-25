@@ -1,3 +1,4 @@
+
 package com.udacity.asteroidradar.detail
 
 
@@ -27,9 +28,21 @@ class DetailFragment : Fragment() {
         binding.viewModel = ViewModelProvider(this,viewModelFactory).get(DetailViewModel::class.java)
         binding.asteroid = asteroid
 
+
         binding.helpButton.setOnClickListener {
             displayAstronomicalUnitExplanationDialog()
         }
+
+        //Adding content description dynamically
+        if(asteroid.isPotentiallyHazardous)
+        {
+            binding.activityMainImageOfTheDay.contentDescription = getString(R.string.potentially_hazardous_asteroid_image)
+        }else
+        {
+            binding.activityMainImageOfTheDay.contentDescription = getString(R.string.not_hazardous_asteroid_image)
+        }
+
+
 
         return binding.root
     }
