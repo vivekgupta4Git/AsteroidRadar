@@ -6,8 +6,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
-import androidx.room.RoomDatabase
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.PictureOfDay
@@ -15,7 +13,6 @@ import com.udacity.asteroidradar.database.AsteroidDatabase
 import com.udacity.asteroidradar.network.AsteroidApi
 import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,7 +26,7 @@ enum class Asteroid_Status{
 /*
 Copied from knowledge center
  */
-enum class MenuItemFilter(val value:String){
+enum class Filter(val value:String){
     SHOW_WEEK("week"),
     SHOW_TODAY("today"),
     SAVED("saved")
@@ -50,9 +47,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     get() = _picOfTheDay
 
     //menu
-    private val _menuItem = MutableLiveData<MenuItemFilter>()
-    private val menuItem:LiveData<MenuItemFilter>
-    get() = _menuItem
+    private val _filter = MutableLiveData<Filter>()
+    private val filter:LiveData<Filter>
+    get() = _filter
 
 
 
@@ -76,7 +73,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
     /*
-    copied from knowledege center to make recycler view update filter.
+    making an observer to update recycler view
      */
     private val asteroidListObserver = androidx.lifecycle.Observer<List<Asteroid>>{
         //update new list to recycler view
@@ -86,12 +83,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private  var asteroidListLiveData : LiveData<List<Asteroid>>
 
     init {
-        /*
-      line->  THIS IS NOT MY CODE, USING SOLUTION FROM KNOWLEDGE CENTER
-         */
-   /* line 1*/     asteroidListLiveData = repo.getAsteroidBasedOnFilter(MenuItemFilter.SAVED)
 
-   /*line 2*/     asteroidListLiveData.observeForever(asteroidListObserver)
+       asteroidListLiveData = repo.getAsteroidBasedOnFilter(Filter.SAVED)
+     asteroidListLiveData.observeForever(asteroidListObserver)
 
             getResponse()
     }
@@ -125,7 +119,7 @@ try {
             _status.value = Asteroid_Status.LOADING
             getPictureOfDay()
             repo.refreshAsteroids()
-            repo.getAsteroidBasedOnFilter(MenuItemFilter.SAVED)
+            repo.getAsteroidBasedOnFilter(Filter.SAVED)
 
             _status.value = Asteroid_Status.DONE
 
@@ -172,7 +166,7 @@ Finally using Moshi to get picture of the day
     }
 
 
-    fun updateFilter(filter : MenuItemFilter){
+    fun updateFilter(filter : Filter){
         asteroidListLiveData = repo.getAsteroidBasedOnFilter(filter)
         asteroidListLiveData.observeForever(asteroidListObserver)
     }

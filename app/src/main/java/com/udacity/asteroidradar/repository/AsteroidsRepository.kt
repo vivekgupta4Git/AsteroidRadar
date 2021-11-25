@@ -8,8 +8,7 @@ import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.database.AsteroidDatabase
 import com.udacity.asteroidradar.database.asDomainModel
-import com.udacity.asteroidradar.main.MainViewModel
-import com.udacity.asteroidradar.main.MenuItemFilter
+import com.udacity.asteroidradar.main.Filter
 import com.udacity.asteroidradar.main.getDateAfterSevenDaysFromToday
 import com.udacity.asteroidradar.network.AsteroidApi
 import kotlinx.coroutines.Dispatchers
@@ -28,14 +27,14 @@ class AsteroidsRepository(private val database: AsteroidDatabase) {
         }
 
 
-    fun getAsteroidBasedOnFilter(filter: MenuItemFilter): LiveData<List<Asteroid>> {
+    fun getAsteroidBasedOnFilter(filter: Filter): LiveData<List<Asteroid>> {
         return when (filter) {
-            MenuItemFilter.SAVED -> {
+            Filter.SAVED -> {
                 Transformations.map(database.asteroidDao.getAsteroids()) {
                     it.asDomainModel()
                 }
             }
-            MenuItemFilter.SHOW_TODAY -> {
+            Filter.SHOW_TODAY -> {
                 Transformations.map(database.asteroidDao.getTodayAsteroid()) {
                     it.asDomainModel()
                 }
